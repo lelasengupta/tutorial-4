@@ -1,0 +1,17 @@
+---
+title: "Models"
+author: "Lela"
+format: html
+execute:
+  echo: false
+---
+
+To understand what proportion of voters will vote for Biden in the 2024 election, we used data from a YouGov poll of 1,559 adult citizens, conducted March 10 to 12 2024.
+
+```{r}
+#| label: setup
+#| message: FALSE
+
+library(tidyverse)
+```
+
