@@ -4,3 +4,5 @@
 .Ruserdata
 *Rproj
 models_files/
+models_cache/
+rsconnect

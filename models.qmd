@@ -6,12 +6,59 @@ execute:
   echo: false
 ---
 
-To understand what proportion of voters will vote for Biden in the 2024 election, we used data from a YouGov poll of 1,559 adult citizens, conducted March 10 to 12 2024.
-
 ```{r}
 #| label: setup
 #| message: FALSE
 
 library(tidyverse)
+library(brms)
+library(tidybayes)
+library(gtsummary)
 ```
 
+```{r}
+#| label: plot
+poll_data <- tibble(biden = c(rep(1, 655), 
+                              rep(0, 904)))
+
+fit_bern <- brm(formula = biden ~ 1,
+    data = poll_data,
+    family = bernoulli(),
+    refresh = 0,
+    silent = 2,
+    seed = 9)
+
+ndata <- tibble(.rows = 1)
+
+fit_bern |> add_epred_draws(newdata = ndata) |>
+select(.epred) |>
+ggplot(aes(x = .epred)) +
+geom_density(aes(y = after_stat(count/sum(count)))) +
+scale_x_continuous(labels = scales::percent_format()) +
+scale_y_continuous(labels = scales::percent_format()) +
+labs(title = "Posterior Distribution of p",
+     x = "Proportion, p, of Votes for Biden",
+     y = "Probability")
+
+```
+
+$$ biden_i =  \mu + \epsilon_i $$
+
+```{r}
+#| label: model
+#| cache: true
+poll_data <- tibble(biden = c(rep(1, 655), 
+                              rep(0, 904)))
+fit_bern <- brm(formula = biden ~ 1,
+    data = poll_data,
+    family = bernoulli(),
+    refresh = 0,
+    silent = 2,
+    seed = 9)
+
+tbl_regression(fit_bern, intercept = TRUE)
+
+```
+
+
+To understand what proportion of voters will vote for Biden in the 2024 election, we used data from a YouGov poll of 1,559 adult citizens, conducted March 10 to 12 2024. Biden's popularity may change significantly before election day. In this poll, support for Biden was much lower than 50%. We estimate that Biden's share of the vote will be about 42%, plus or minus 2.5%. 
